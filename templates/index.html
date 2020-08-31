@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>League Live Match Predictor</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <!-- Script to handle socket.io -->
+    <script>
+        var socket;
+        $(document).ready(function() {
+            // The http vs. https is important. Use http for localhost!
+            socket = io.connect('http://127.0.0.1:5000');
+            socket.emit('startMatch', "OMG IS HTIS WORKING");
+            {% set ns = namespace() %}
+            socket.on('redirect', function(data){
+            window.location = data.url;
+            {% set ex = [0.2332422, 0.3322343] %};
+<!--            location.reload();-->
+            socket.emit('startMatch');
+            });
+        });
+    </script>
+    <style>
+        .bg {
+            background-color: #F81AB2;
+         }
+        footer {
+            position:relative;
+            width:100%;
+            height: 10%px;
+            text-align: center;
+            bottom:0px;
+            color: black
+         }
+        .pie{
+            display: block;
+            width: 300px;
+            height:300px;
+            border-radius:50%;
+            position:relative;
+             background-image: conic-gradient(
+                            blue {{variables.predictions[1] * 360}}deg,
+                            red 0);
+            justify-content: center;
+            align-items:center;
+            margin-left:auto;
+            margin-right:auto;
+            background-color:inherit
+         }
+         .bord{
+            border-style: solid;
+            border-width: medium
+         }
+
+         .mvright{
+             padding-right:10px;
+             float:right;
+         }
+
+         .mvleft{
+             padding-left:10px;
+             float:left;
+         }
+
+    </style>
+</head>
+  <body class="text-center" style="background-image: url('https://www.toptal.com/designers/subtlepatterns/patterns/double-bubble-outline.png')">
+    <header class="masthead mb-auto" style="background-color:black; padding-top:10px; padding-bottom:10px; color:white">
+        <div class="inner bord">
+            <h1 class="masthead-brand" style="font-family:'Courier'"><b>League of Legends Live Match Predictor</b></h1>
+        </div>
+    </header>
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+      <main role="main" class="inner cover">
+          {{variables.predictions}}
+        {% if variables.predictions[1] > 0.50 %}
+
+            <p class="lead" style="font-weight:bold; font-size:32px; color:blue">Blue has a {{variables.predictions[1] * 100}}% chance of winning!</p>
+            <p class="lead">Red has a {{(1-variables.predictions[1])*100}}% chance of winning!</p>
+        {% else %}
+            <p class="lead">Blue has a {{variables.predictions[1] * 100}} chance of winning!</p>
+            <p class="lead" style="font-weight:bold; font-size:32px; color:red">Red has a {{(1-variables.predictions[1]) * 100}} chance of winning!</p>
+        {% endif %}
+        <div class="pie"></div>
+
+
+        <p class="lead">
+
+        </p>
+      </main>
+    </div>
+    <div class="container">
+        <h1><b>Stats</b></h1>
+        <hr>
+        <h2><p style="list-style-position:inside">Game Duration: {{variables['predictionData']['gameDuration'][0] / 60}} Minutes</p></h2>
+        <br>
+        <div class="row">
+            <div class="col-sm">
+                <ul style = "text-align:left; margin-left:auto;background-color:#ADD8E6; border-left: 6px solid #0000FF">
+                    <li>Red Side Towers Destroyed - <span class="mvright">{{variables['predictionData']['Red Side Towers Destroyed'][0]}}</span></li>
+                    <li>Red Side Inhibitors Destroyed - <span class="mvright">{{variables['predictionData']['Red Side Inhibitors Destroyed'][0]}}</span></li>
+                    <li>Blue Side Baron Kills - <span class="mvright">{{variables['predictionData']['Blue Side Baron Kills'][0]}}</span></li>
+                    <li>Blue Side Rift Herald Kills - <span class="mvright">{{variables['predictionData']['Blue Side RiftHerald Kills'][0]}}</span></li>
+                    <li>Blue Side Dragon Kills - <span class="mvright">{{variables['predictionData']['Blue Side Dragon Kills'][0]}}</span></li>
+                    <li>Blue Side Elder Dragon Kills - <span class="mvright">{{variables['predictionData']['Blue Side Elders'][0]}}</span></li>
+                    <li>Blue Side Total Power Level - <span class="mvright">{{variables['predictionData']['Blue Side Total Power Level'][0]}}</span></li>
+                    <li>Blue Side Total Vision - <span class="mvright">{{variables['predictionData']['Blue Side Total Vision Score'][0]}}</span></li>
+                    <li>Blue Side Total Kills - <span class="mvright">{{variables['predictionData']['Blue Side Total Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Kills -  <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Deaths -  <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Assists - <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Champion Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Vision Score - <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Champion KDA - <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Champion Matches - <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Champion Patch Win Rate - <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Champ WinRate'][0]}}%</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 1 Name']}} Power Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 1 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Kills - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Deaths - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Assists - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Champion Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Vision Score - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Champion KDA - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Champion Matches - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Champion Patch Win Rate - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 2 Name']}} Power Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 2 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Kills - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Deaths - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Assists - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Champion Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Vision Score - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Champion KDA - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Champion Matches - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Champion Patch Win Rate - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 3 Name']}} Power Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 3 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Kills - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Deaths - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Assists - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Champion Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Vision Score - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Champion KDA - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Champion Matches - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Champion Patch Win Rate - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 4 Name']}} Power Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 4 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Kills - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Deaths - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Assists - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Champion Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Vision Score - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Champion KDA - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Champion Matches - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Champion Patch Win Rate - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Blue Side Player 5 Name']}} Power Level - <span class="mvright">{{variables['predictionData']['Blue Side Player 5 Power Level'][0]}}</span></li>
+                </ul>
+            </div>
+            <div class="col-sm">
+                <ul style="text-align:right; margin-right:auto; direction:rtl; background-color:#FFCCCB; border-right: 6px solid #FF0000">
+                    <li>Blue Side Towers Destroyed - <span class="mvleft">{{variables['predictionData']['Blue Side Towers Destroyed'][0]}}</span></li>
+                    <li>Blue Side Inhibitors Destroyed - <span class="mvleft">{{variables['predictionData']['Blue Side Inhibitors Destroyed'][0]}}</span></li>
+                    <li>Red Side Baron Kills - <span class="mvleft">{{variables['predictionData']['Red Side Baron Kills'][0]}}</span></li>
+                    <li>Red Side RiftHerald Kills - <span class="mvleft">{{variables['predictionData']['Red Side Baron Kills'][0]}}</span></li>
+                    <li>Red Side Dragon Kills - <span class="mvleft">{{variables['predictionData']['Red Side Dragon Kills'][0]}}</span></li>
+                    <li>Red Side Elder Dragon Kills - <span class="mvleft">{{variables['predictionData']['Red Side Elders'][0]}}</span></li>
+                    <li>Red Side Total Power Level - <span class="mvleft">{{variables['predictionData']['Red Side Total Power Level'][0]}}</span></li>
+                    <li>Red Side Total Vision - <span class="mvleft">{{variables['predictionData']['Red Side Total Vision Score'][0]}}</span></li>
+                    <li>Red Side Total Kills - <span class="mvleft">{{variables['predictionData']['Red Side Total Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Kills - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Deaths - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Assists - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Champion Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Vision Score - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Champion KDA - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Champion Matches - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Champion Patch Win Rate - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 1 Name']}} Power Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 1 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Kills - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Deaths - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Assists - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Champion Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Vision Score - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Champion KDA - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Champion Matches - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Champion Patch Win Rate - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 2 Name']}} Power Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 2 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Kills - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Deaths - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Assists - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Champion Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Vision Score - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Champion KDA - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Champion Matches - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Champion Patch Win Rate - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 3 Name']}} Power Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 3 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Kills - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Deaths - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Assists - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Champion Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Vision Score - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Champion KDA - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Champion Matches - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Champion Patch Win Rate - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 4 Name']}} Power Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Power Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Kills - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Kills'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Deaths - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Deaths'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Assists - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Assists'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Champion Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ Level'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Vision Score - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Vision Score'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Champion KDA - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ KDA'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Champion Matches - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ Matches'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Champion Patch Win Rate - <span class="mvleft">{{variables['predictionData']['Red Side Player 4 Champ WinRate'][0]}}</span></li>
+                    <li>{{variables.summonerList['Red Side Player 10 Name']}} Power Level - <span class="mvleft">{{variables['predictionData']['Red Side Player 5 Power Level'][0]}}</span></li>
+                </ul>
+            </div>
+
+
+        </div>
+
+         <ul style="list-style-position:inside">
+             <h3><p>Blue Side Vision Score Difference: {{variables['predictionData']['Blue Side Vision Score Difference'][0]}}</p></h3>
+             <h3><p>Blue Side Power Level Difference: {{variables['predictionData']['Blue Side Power Level Difference'][0]}}</p></h3>
+             <h3><p>Blue Side Kills Difference: {{variables['predictionData']['Blue Side Kills Difference'][0]}}</p></h3>
+         </ul>
+    </div>
+
+    <footer class="border" style="background-color:black;color:white; padding-top:20px">
+        <div class="inner">
+            <a href = "https://github.com/vincentviray01"><img width=64px height=64px src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"></a>
+            <a href = "https://www.linkedin.com/in/vincent-viray/"><img width=64px height=64px src = "https://p7.hiclipart.com/preview/770/968/854/social-media-computer-icons-linkedin-icon-design-social-network-social-media.jpg"></a>
+            <p>Email: vincentviray01@gmail.com</p>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="../../assets/js/vendor/popper.min.js"></script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

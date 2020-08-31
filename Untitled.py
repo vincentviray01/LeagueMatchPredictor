@@ -32,7 +32,7 @@ pd.set_option('display.max_rows', 15000)
 # Delete any rows in which the summoner name is no longer valid (change summoner name), so can't get champ winrate and kda
 # Some games have "None" values for the roles, so maybe disregard those partiuclar role, not sure yet
 
-API_KEY = "RGAPI-d53802be-dd72-4908-a0f5-bf9e859e38c7"
+API_KEY = "RGAPI-64bcb52d-1ccb-4fc5-a7ec-8050226f63bb"
 PLATFORM_ROUTING_VALUE = "na1.api.riotgames.com"
 REGIONAL_ROUTING_VALUE = "americas.api.riotgames.com"
 watcher = LolWatcher(API_KEY)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # gameIDs = []
     # matches = pd.DataFrame()
 
-    matches = pd.read_pickle("updatedMatches2.pickle")
+    matches = pd.read_pickle("updatedMatches3.pickle")
 
     with open("players3.pickle", 'rb') as pick:
         players = pickle.load(pick)
@@ -162,8 +162,17 @@ if __name__ == "__main__":
         response = get(url).text
         soup = BeautifulSoup(response, 'html.parser')
 
-        return float(
+
+        try:
+            return float(
             soup.find(text=currentChampion).parent.parent.parent.parent.find("td", {"class": "KDA"})['data-value'])
+        except Exception as e:
+            print("Region: ", region)
+            print("Username: ", username)
+            print("Champion: ", currentChampion)
+            print("Exception: ", e)
+            print(url)
+            return -1
 
 
     def getChampGames(region, username, currentChampion):
@@ -176,6 +185,7 @@ if __name__ == "__main__":
         url = f"https://{region}op.gg/summoner/champions/userName={username}"
         response = get(url).text
         soup = BeautifulSoup(response, 'html.parser')
+
         try:
             wins = int(
                 soup.find(text=currentChampion).parent.parent.parent.parent.find("div", {"class": "Text Left"}).text[
@@ -188,6 +198,7 @@ if __name__ == "__main__":
                 :-1])
         except:
             losses = 0
+
         return wins + losses
 
 
@@ -524,6 +535,33 @@ red4champPatchWinRate = []
 red5champPatchWinRate = []
 # # matches["Blue Side Player 1 Champion Win Ratio"] = matches.apply(lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'], x['Blue Side Player 1 Champion']), axis = 1)
 print()
+
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'], champ2champ[index2champ[x['participants'][0]['championId']]]), axis = 1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("blue1champWinRates2.pickle", 'wb') as pick:
+#     pickle.dump(blue1champWinRates, pick)
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     blue2champWinRates.append(matches.iloc[x:x + 1, :].apply(lambda x: getWinRatio(x['platformId'], x['participantIdentities'][1]['player']['summonerName'], champ2champ[index2champ[x['participants'][1]['championId']]]), axis = 1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("blue2champWinRates2.pickle", 'wb') as pick:
+#     pickle.dump(blue2champWinRates, pick)
+#
 # for x in tqdm(range(len(matches))):
 #     # try:
 #     blue3champWinRates.append(matches.iloc[x:x + 1, :].apply(lambda x: getWinRatio(x['platformId'], x['participantIdentities'][2]['player']['summonerName'], champ2champ[index2champ[x['participants'][2]['championId']]]), axis = 1))
@@ -534,7 +572,7 @@ print()
 #     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
 #     #                               x['Blue Side Player 1 Champion']), axis = 1))
 #     #     print("SHOULD BE FIXED NOW")
-# with open("blue3champWinRates.pickle", 'wb') as pick:
+# with open("blue3champWinRates2.pickle", 'wb') as pick:
 #     pickle.dump(blue3champWinRates, pick)
 #
 # for x in tqdm(range(len(matches))):
@@ -549,7 +587,7 @@ print()
 #     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
 #     #                               x['Blue Side Player 1 Champion']), axis = 1))
 #     #     print("SHOULD BE FIXED NOW")
-# with open("blue4champWinRates.pickle", 'wb') as pick:
+# with open("blue4champWinRates2.pickle", 'wb') as pick:
 #     pickle.dump(blue4champWinRates, pick)
 #
 # for x in tqdm(range(len(matches))):
@@ -564,7 +602,7 @@ print()
 #     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
 #     #                               x['Blue Side Player 1 Champion']), axis = 1))
 #     #     print("SHOULD BE FIXED NOW")
-# with open("blue5champWinRates.pickle", 'wb') as pick:
+# with open("blue5champWinRates2.pickle", 'wb') as pick:
 #     pickle.dump(blue5champWinRates, pick)
 #
 # for x in tqdm(range(len(matches))):
@@ -579,7 +617,7 @@ print()
 #     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
 #     #                               x['Blue Side Player 1 Champion']), axis = 1))
 #     #     print("SHOULD BE FIXED NOW")
-# with open("red1champWinRates.pickle", 'wb') as pick:
+# with open("red1champWinRates2.pickle", 'wb') as pick:
 #     pickle.dump(red1champWinRates, pick)
 #
 # for x in tqdm(range(len(matches))):
@@ -594,7 +632,7 @@ print()
 #     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
 #     #                               x['Blue Side Player 1 Champion']), axis = 1))
 #     #     print("SHOULD BE FIXED NOW")
-# with open("red2champWinRates.pickle", 'wb') as pick:
+# with open("red2champWinRates2.pickle", 'wb') as pick:
 #     pickle.dump(red2champWinRates, pick)
 #
 # for x in tqdm(range(len(matches))):
@@ -609,86 +647,333 @@ print()
 #     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
 #     #                               x['Blue Side Player 1 Champion']), axis = 1))
 #     #     print("SHOULD BE FIXED NOW")
-# with open("red3champWinRates.pickle", 'wb') as pick:
+# with open("red3champWinRates2.pickle", 'wb') as pick:
 #     pickle.dump(red3champWinRates, pick)
 #
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     red4champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][8]['player']['summonerName'],
+#                               champ2champ[index2champ[x['participants'][8]['championId']]]), axis=1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("red4champWinRates2.pickle", 'wb') as pick:
+#     pickle.dump(red4champWinRates, pick)
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     red5champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][9]['player']['summonerName'],
+#                               champ2champ[index2champ[x['participants'][9]['championId']]]), axis=1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("red5champWinRates2.pickle", 'wb') as pick:
+#     pickle.dump(red5champWinRates, pick)
+
+#
+# ########################################################################################################################3
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'], champ2champ[index2champ[x['participants'][0]['championId']]]), axis = 1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("blue1champMatches.pickle", 'wb') as pick:
+#     pickle.dump(blue1champMatches, pick)
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     blue2champMatches.append(matches.iloc[x:x + 1, :].apply(lambda x: getChampGames(x['platformId'], x['participantIdentities'][1]['player']['summonerName'], champ2champ[index2champ[x['participants'][1]['championId']]]), axis = 1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("blue2champMatches.pickle", 'wb') as pick:
+#     pickle.dump(blue2champMatches, pick)
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     blue3champMatches.append(matches.iloc[x:x + 1, :].apply(lambda x: getChampGames(x['platformId'], x['participantIdentities'][2]['player']['summonerName'], champ2champ[index2champ[x['participants'][2]['championId']]]), axis = 1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("blue3champMatches.pickle", 'wb') as pick:
+#     pickle.dump(blue3champMatches, pick)
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     blue4champMatches.append(matches.iloc[x:x + 1, :].apply(
+#         lambda x: getChampGames(x['platformId'], x['participantIdentities'][3]['player']['summonerName'],
+#                               champ2champ[index2champ[x['participants'][3]['championId']]]), axis=1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("blue4champMatches.pickle", 'wb') as pick:
+#     pickle.dump(blue4champMatches, pick)
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     blue5champMatches.append(matches.iloc[x:x + 1, :].apply(
+#         lambda x: getChampGames(x['platformId'], x['participantIdentities'][4]['player']['summonerName'],
+#                               champ2champ[index2champ[x['participants'][4]['championId']]]), axis=1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("blue5champMatches.pickle", 'wb') as pick:
+#     pickle.dump(blue5champMatches, pick)
+#
+# for x in tqdm(range(len(matches))):
+#     # try:
+#     red1champMatches.append(matches.iloc[x:x + 1, :].apply(
+#         lambda x: getChampGames(x['platformId'], x['participantIdentities'][5]['player']['summonerName'],
+#                               champ2champ[index2champ[x['participants'][5]['championId']]]), axis=1))
+#     # except Exception as e:
+#     #     print("Index: ", x, " with exception: ", e)
+#     #     time.sleep(125)
+#     #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+#     #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+#     #                               x['Blue Side Player 1 Champion']), axis = 1))
+#     #     print("SHOULD BE FIXED NOW")
+# with open("red1champMatches.pickle", 'wb') as pick:
+#     pickle.dump(red1champMatches, pick)
+
 for x in tqdm(range(len(matches))):
     # try:
-    red4champWinRates.append(matches.iloc[x:x + 1, :].apply(
-        lambda x: getWinRatio(x['platformId'], x['participantIdentities'][8]['player']['summonerName'],
+    red2champMatches.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampGames(x['platformId'], x['participantIdentities'][6]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][6]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("red2champMatches.pickle", 'wb') as pick:
+    pickle.dump(red2champMatches, pick)
+
+for x in tqdm(range(len(matches))):
+    # try:
+    red3champMatches.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampGames(x['platformId'], x['participantIdentities'][7]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][7]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("red3champMatches.pickle", 'wb') as pick:
+    pickle.dump(red3champMatches, pick)
+
+for x in tqdm(range(len(matches))):
+    # try:
+    red4champMatches.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampGames(x['platformId'], x['participantIdentities'][8]['player']['summonerName'],
                               champ2champ[index2champ[x['participants'][8]['championId']]]), axis=1))
     # except Exception as e:
     #     print("Index: ", x, " with exception: ", e)
     #     time.sleep(125)
-    #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
-    #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
     #                               x['Blue Side Player 1 Champion']), axis = 1))
     #     print("SHOULD BE FIXED NOW")
-with open("red4champWinRates.pickle", 'wb') as pick:
-    pickle.dump(red4champWinRates, pick)
+with open("red4champMatches.pickle", 'wb') as pick:
+    pickle.dump(red4champMatches, pick)
 
 for x in tqdm(range(len(matches))):
     # try:
-    red5champWinRates.append(matches.iloc[x:x + 1, :].apply(
-        lambda x: getWinRatio(x['platformId'], x['participantIdentities'][9]['player']['summonerName'],
+    red5champMatches.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampGames(x['platformId'], x['participantIdentities'][9]['player']['summonerName'],
                               champ2champ[index2champ[x['participants'][9]['championId']]]), axis=1))
     # except Exception as e:
     #     print("Index: ", x, " with exception: ", e)
     #     time.sleep(125)
-    #     blue1champWinRates.append(matches.iloc[x:x + 1, :].apply(
-    #         lambda x: getWinRatio(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #     blue1champMatches.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampGames(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
     #                               x['Blue Side Player 1 Champion']), axis = 1))
     #     print("SHOULD BE FIXED NOW")
-with open("red5champWinRates.pickle", 'wb') as pick:
-    pickle.dump(red5champWinRates, pick)
+with open("red5champMatches.pickle", 'wb') as pick:
+    pickle.dump(red5champMatches, pick)
 
-    blue2champWinRates = []
-    blue3champWinRates = []
-    blue4champWinRates = []
-    blue5champWinRates = []
 
-    red1champWinRates = []
-    red2champWinRates = []
-    red3champWinRates = []
-    red4champWinRates = []
-    red5champWinRates = []
 
-    blue1champKDA = []
-    blue2champKDA = []
-    blue3champKDA = []
-    blue4champKDA = []
-    blue5champKDA = []
+#######################################################################################################################333
 
-    red1champKDA = []
-    red2champKDA = []
-    red3champKDA = []
-    red4champKDA = []
-    red5champKDA = []
+for x in tqdm(range(len(matches))):
+    # try:
+    blue1champKDA.append(matches.iloc[x:x + 1, :].apply(lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'], champ2champ[index2champ[x['participants'][0]['championId']]]), axis = 1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("blue1champKDA.pickle", 'wb') as pick:
+    pickle.dump(blue1champKDA, pick)
 
-    blue1champMatches = []
-    blue2champMatches = []
-    blue3champMatches = []
-    blue4champMatches = []
-    blue5champMatches = []
+for x in tqdm(range(len(matches))):
+    # try:
+    blue2champKDA.append(matches.iloc[x:x + 1, :].apply(lambda x: getChampKDA(x['platformId'], x['participantIdentities'][1]['player']['summonerName'], champ2champ[index2champ[x['participants'][1]['championId']]]), axis = 1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("blue2champKDA.pickle", 'wb') as pick:
+    pickle.dump(blue2champKDA, pick)
 
-    red1champMatches = []
-    red2champMatches = []
-    red3champMatches = []
-    red4champMatches = []
-    red5champMatches = []
+for x in tqdm(range(len(matches))):
+    # try:
+    blue3champKDA.append(matches.iloc[x:x + 1, :].apply(lambda x: getChampKDA(x['platformId'], x['participantIdentities'][2]['player']['summonerName'], champ2champ[index2champ[x['participants'][2]['championId']]]), axis = 1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("blue3champKDA.pickle", 'wb') as pick:
+    pickle.dump(blue3champKDA, pick)
 
-    blue1champPatchWinRate = []
-    blue2champPatchWinRate = []
-    blue3champPatchWinRate = []
-    blue4champPatchWinRate = []
-    blue5champPatchWinRate = []
+for x in tqdm(range(len(matches))):
+    # try:
+    blue4champKDA.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampKDA(x['platformId'], x['participantIdentities'][3]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][3]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("blue4champKDA.pickle", 'wb') as pick:
+    pickle.dump(blue4champKDA, pick)
 
-    red1champPatchWinRate = []
-    red2champPatchWinRate = []
-    red3champPatchWinRate = []
-    red4champPatchWinRate = []
-    red5champPatchWinRate = []
+for x in tqdm(range(len(matches))):
+    # try:
+    blue5champKDA.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampKDA(x['platformId'], x['participantIdentities'][4]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][4]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("blue5champKDA.pickle", 'wb') as pick:
+    pickle.dump(blue5champKDA, pick)
 
+for x in tqdm(range(len(matches))):
+    # try:
+    red1champKDA.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampKDA(x['platformId'], x['participantIdentities'][5]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][5]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("red1champKDA.pickle", 'wb') as pick:
+    pickle.dump(red1champKDA, pick)
+
+for x in tqdm(range(len(matches))):
+    # try:
+    red2champKDA.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampKDA(x['platformId'], x['participantIdentities'][6]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][6]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("red2champKDA.pickle", 'wb') as pick:
+    pickle.dump(red2champKDA, pick)
+
+for x in tqdm(range(len(matches))):
+    # try:
+    red3champKDA.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampKDA(x['platformId'], x['participantIdentities'][7]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][7]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("red3champKDA.pickle", 'wb') as pick:
+    pickle.dump(red3champKDA, pick)
+
+for x in tqdm(range(len(matches))):
+    # try:
+    red4champKDA.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampKDA(x['platformId'], x['participantIdentities'][8]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][8]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("red4champKDA.pickle", 'wb') as pick:
+    pickle.dump(red4champKDA, pick)
+
+for x in tqdm(range(len(matches))):
+    # try:
+    red5champKDA.append(matches.iloc[x:x + 1, :].apply(
+        lambda x: getChampKDA(x['platformId'], x['participantIdentities'][9]['player']['summonerName'],
+                              champ2champ[index2champ[x['participants'][9]['championId']]]), axis=1))
+    # except Exception as e:
+    #     print("Index: ", x, " with exception: ", e)
+    #     time.sleep(125)
+    #     blue1champKDA.append(matches.iloc[x:x + 1, :].apply(
+    #         lambda x: getChampKDA(x['platformId'], x['participantIdentities'][0]['player']['summonerName'],
+    #                               x['Blue Side Player 1 Champion']), axis = 1))
+    #     print("SHOULD BE FIXED NOW")
+with open("red5champKDA.pickle", 'wb') as pick:
+    pickle.dump(red5champKDA, pick)
 
 
 
