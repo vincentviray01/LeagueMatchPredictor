@@ -37,6 +37,7 @@ def predict():
         return render_template('index.html', variables=variables)
     except Exception as e:
         try:
+            print(y)
             print(e)
             print("A nee live match has started!")
             with open("rf.pickle", "rb") as pick:
