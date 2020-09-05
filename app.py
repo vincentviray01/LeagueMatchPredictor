@@ -32,8 +32,24 @@ def checkLive():
 @app.route('/<int:port>')
 def predict(port):
     try:
+        # If the match has already started and there has already been a prediction, then there is no need to
+        # actually scrape the summoner stats again, so it will save a lot of time
         with open("variables2.pickle", "rb") as pick:
             variables = pickle.load(pick)
+        prediction_data, _ = getData(port, scrape=False)
+
+        for player in ['Blue Side Player 1', 'Blue Side Player 2', 'Blue Side Player 3', 'Blue Side Player 4', 'Blue Side Player 5', 'Red Side Player 1', 'Red Side Player 2', 'Red Side Player 3', 'Red Side Player 4', 'Red Side Player 5']:
+            prediction_data[player + ' Champ KDA'] = variables['predictionData'][player + ' Champ KDA']
+            prediction_data[player + ' Champ Matches'] = variables['predictionData'][player + ' Champ Matches']
+            prediction_data[player + ' Champ WinRate'] = variables['predictionData'][player + ' Champ WinRate']
+        with open("rf.pickle", "rb") as pick:
+            rf = pickle.load(pick)
+        prediction_data = pd.DataFrame(prediction_data, index=[0])
+        prediction = rf.predict_proba(prediction_data)[0]
+        variables['predictionData'] = prediction_data
+        variables['predictions'] = prediction
+        with open("variables2.pickle", "wb") as pick:
+            pickle.dump(variables, pick)
         return render_template('index.html', variables=variables)
     except Exception as e:
         try:
@@ -41,7 +57,7 @@ def predict(port):
             print("A nee live match has started!")
             with open("rf.pickle", "rb") as pick:
                 rf = pickle.load(pick)
-            prediction_data, player_list = getData(port)
+            prediction_data, player_list = getData(port, scrape=True)
 
             prediction_data = pd.DataFrame(prediction_data, index=[0])
             prediction = rf.predict_proba(prediction_data)[0]
@@ -116,7 +132,7 @@ def getChampWinRate(region, currentChampion):
     return soup.find(text=currentChampion).parent.parent.parent.findAll("td")[3]['data-value']
 
 
-def getData(port):
+def getData(port, scrape):
     with open("item2value.pickle", "rb") as pick:
         item2value = pickle.load(pick)
     response = requests.get(f'https://127.0.0.1:{port}/liveclientdata/allgamedata')
@@ -204,21 +220,22 @@ def getData(port):
         data[player + ' Power Level'] = 0
         for item in info['items']:
             data[player + ' Power Level'] += item2value[item['displayName']]
-        try:
-            data[player + ' Champ WinRate'] = getChampWinRate("NA1", info['championName'])
-        except Exception as e:
-            print(e)
-            data[player + ' Champ WinRate'] = 50
-        try:
-            data[player + ' Champ Matches'] = getChampGames("NA1", info['summonerName'], info['championName'])
-        except Exception as e:
-            print(e)
-            data[player + ' Champ Matches'] = 0
-        try:
-            data[player + ' Champ KDA'] = getChampKDA("NA1", info['summonerName'], info['championName'])
-        except Exception as e:
-            print(e)
-            data[player + ' Champ KDA'] = 2.2
+        if scrape:
+            try:
+                data[player + ' Champ WinRate'] = getChampWinRate("NA1", info['championName'])
+            except Exception as e:
+                print(e)
+                data[player + ' Champ WinRate'] = 50
+            try:
+                data[player + ' Champ Matches'] = getChampGames("NA1", info['summonerName'], info['championName'])
+            except Exception as e:
+                print(e)
+                data[player + ' Champ Matches'] = 0
+            try:
+                data[player + ' Champ KDA'] = getChampKDA("NA1", info['summonerName'], info['championName'])
+            except Exception as e:
+                print(e)
+                data[player + ' Champ KDA'] = 2.2
 
     data['Blue Side Total Power Level'] = data['Blue Side Player 1 Power Level'] + data[
         'Blue Side Player 2 Power Level'] + data['Blue Side Player 3 Power Level'] + data[
