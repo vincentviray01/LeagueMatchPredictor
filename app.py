@@ -11,41 +11,51 @@ from selenium.webdriver.chrome.options import Options
 import pandas as pd
 from flask_socketio import *
 import time
+import os
+
 
 app = Flask(__name__)
 socketio = SocketIO(app, logger=True)
 
+
+@socketio.on('checkLive')
+def checkLive():
+    try:
+        response = requests.get('https://127.0.0.1:2999/liveclientdata/allgamedata')
+    except:
+        if os.path.exists('variables2.pickle'):
+            os.remove('variables2.pickle')
+        pass
+
+
 @app.route('/index')
 @app.route('/')
 def predict():
-    with open("rf.pickle", "rb") as pick:
-        rf = pickle.load(pick)
-    # prediction_data, player_list = getData()
-    #
-    # prediction_data = pd.DataFrame(prediction_data, index=[0])
-    # prediction = rf.predict(prediction_data)
-    # variables = {}
-    # variables['predictionData'] = prediction_data
-    # variables['summonerList'] = player_list
-    # variables['predictions'] = prediction
-    with open("variables2.pickle", "rb") as pick:
-        variables = pickle.load(pick)
-    return render_template('index.html', variables=variables)
-@app.route('/hello')
-def hello():
-    return '2'
+    try:
+        with open("variables2.pickle", "rb") as pick:
+            variables = pickle.load(pick)
+        return render_template('index.html', variables=variables)
+    except Exception as e:
+        print(e)
+        print("A nee live match has started!")
+        with open("rf.pickle", "rb") as pick:
+            rf = pickle.load(pick)
+        prediction_data, player_list = getData()
+
+        prediction_data = pd.DataFrame(prediction_data, index=[0])
+        prediction = rf.predict_proba(prediction_data)[0]
+        variables = {}
+        variables['predictionData'] = prediction_data
+        variables['summonerList'] = player_list
+        variables['predictions'] = prediction
+        with open("variables2.pickle", "wb") as pick:
+            pickle.dump(variables, pick)
+
+        return render_template('index.html', variables=variables)
 
 @socketio.on('startMatch')
-def startMatch(data = 2):
+def startMatch():
     time.sleep(5)
-    print("DFHUDF")
-    # print("ONSDNFSDFNS")
-    # print(data)
-    with open("variables2.pickle", "rb") as pick:
-        variables = pickle.load(pick)
-    # print(type(variables))
-    variables = json.dumps(variables)
-    print("Should be returnng")
     emit('redirect', {'url': url_for('predict')})
 
 def getChampKDA(region, username, currentChampion):
