@@ -23,8 +23,8 @@ def checkLive():
     try:
         response = requests.get('https://127.0.0.1:2999/liveclientdata/allgamedata')
     except:
-        if os.path.exists('variables2.pickle'):
-            os.remove('variables2.pickle')
+        # if os.path.exists('variables2.pickle'):
+        #     os.remove('variables2.pickle')
         pass
 
 
@@ -53,13 +53,13 @@ def predict(port):
                 pickle.dump(variables, pick)
 
             return render_template('index.html', variables=variables)
-        except:
-            return "No Ongoing Match Right now..."
+        except Exception as e:
+            return str(e)
 
 @socketio.on('startMatch')
 def startMatch():
     time.sleep(5)
-    emit('redirect', {'url': url_for('predict')})
+    # emit('redirect', {'url': url_for('predict')})
 
 def getChampKDA(region, username, currentChampion):
     if region == "KR":
