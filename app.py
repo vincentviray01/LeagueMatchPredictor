@@ -36,22 +36,25 @@ def predict():
             variables = pickle.load(pick)
         return render_template('index.html', variables=variables)
     except Exception as e:
-        print(e)
-        print("A nee live match has started!")
-        with open("rf.pickle", "rb") as pick:
-            rf = pickle.load(pick)
-        prediction_data, player_list = getData()
+        try:
+            print(e)
+            print("A nee live match has started!")
+            with open("rf.pickle", "rb") as pick:
+                rf = pickle.load(pick)
+            prediction_data, player_list = getData()
 
-        prediction_data = pd.DataFrame(prediction_data, index=[0])
-        prediction = rf.predict_proba(prediction_data)[0]
-        variables = {}
-        variables['predictionData'] = prediction_data
-        variables['summonerList'] = player_list
-        variables['predictions'] = prediction
-        with open("variables2.pickle", "wb") as pick:
-            pickle.dump(variables, pick)
+            prediction_data = pd.DataFrame(prediction_data, index=[0])
+            prediction = rf.predict_proba(prediction_data)[0]
+            variables = {}
+            variables['predictionData'] = prediction_data
+            variables['summonerList'] = player_list
+            variables['predictions'] = prediction
+            with open("variables2.pickle", "wb") as pick:
+                pickle.dump(variables, pick)
 
-        return render_template('index.html', variables=variables)
+            return render_template('index.html', variables=variables)
+        except:
+            return "No Ongoing Match Right now..."
 
 @socketio.on('startMatch')
 def startMatch():
