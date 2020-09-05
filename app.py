@@ -29,20 +29,19 @@ def checkLive():
 
 
 @app.route('/index')
-@app.route('/')
-def predict():
+@app.route('/<int:port>')
+def predict(port):
     try:
         with open("variables2.pickle", "rb") as pick:
             variables = pickle.load(pick)
         return render_template('index.html', variables=variables)
     except Exception as e:
         try:
-            print(y)
             print(e)
             print("A nee live match has started!")
             with open("rf.pickle", "rb") as pick:
                 rf = pickle.load(pick)
-            prediction_data, player_list = getData()
+            prediction_data, player_list = getData(port)
 
             prediction_data = pd.DataFrame(prediction_data, index=[0])
             prediction = rf.predict_proba(prediction_data)[0]
@@ -117,12 +116,12 @@ def getChampWinRate(region, currentChampion):
     return soup.find(text=currentChampion).parent.parent.parent.findAll("td")[3]['data-value']
 
 
-def getData():
+def getData(port):
     with open("item2value.pickle", "rb") as pick:
         item2value = pickle.load(pick)
-    # response = requests.get('https://static.developer.riotgames.com/docs/lol/liveclientdata_sample.json')
-    with open("exjson.json", "rb") as pick:
-        response = pickle.load(pick)
+    response = requests.get(f'https://127.0.0.1:{port}/liveclientdata/allgamedata')
+    # with open("exjson.json", "rb") as pick:
+    #     response = pickle.load(pick)
     text = json.loads(response)
     data = {}
     data['Blue Side Elders'] = 0
@@ -253,5 +252,5 @@ def getData():
     return data, player_list
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=False)
 
