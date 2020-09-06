@@ -10,8 +10,9 @@ In order too use this website, make sure you are in an active match of league of
 
 If you get a response, copy the data and go to liveleaguematchpredictor.herokuapp.com where there will be an text box for you to paste the copied data. Simply click the input button and you will enter a page similar to the images below.
 
-
-
+!['websiteimage1'](https://raw.githubusercontent.com/vincentviray01/LeagueMatchPredictor/master/images/leagueliveclient1.png.png)
+!['websiteimage2'](https://raw.githubusercontent.com/vincentviray01/LeagueMatchPredictor/master/images/leagueliveclient12png.png)
+!['websiteimage3'](https://raw.githubusercontent.com/vincentviray01/LeagueMatchPredictor/master/images/leagueliveclient13png.png)
 
 
 
