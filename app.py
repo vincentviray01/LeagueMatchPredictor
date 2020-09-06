@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from flask import request
 from flask import url_for
 import requests
 from requests import get
@@ -29,14 +30,25 @@ def checkLive():
 
 
 @app.route('/index')
-@app.route('/<int:port>')
+@app.route('/<int:port>', methods=['GET', 'POST'])
 def predict(port):
+    if request.method == "GET":
+        if os.path.exists('variables2.pickle'):
+            os.remove('variables2.pickle')
+        return render_template('broken.html')
+    else:
+        response = request.form['json_data']
     try:
         # If the match has already started and there has already been a prediction, then there is no need to
         # actually scrape the summoner stats again, so it will save a lot of time
         with open("variables2.pickle", "rb") as pick:
             variables = pickle.load(pick)
-        prediction_data, _ = getData(port, scrape=False)
+        for player in response['allPlayers']:
+            if player['summonerName'] not in list(variables['summonerList'].values()):
+                if os.path.exists('variables2.pickle'):
+                    os.remove('variables2.pickle')
+                raise Exception("New match has started")
+        prediction_data, _ = getData(response, scrape=False)
 
         for player in ['Blue Side Player 1', 'Blue Side Player 2', 'Blue Side Player 3', 'Blue Side Player 4', 'Blue Side Player 5', 'Red Side Player 1', 'Red Side Player 2', 'Red Side Player 3', 'Red Side Player 4', 'Red Side Player 5']:
             prediction_data[player + ' Champ KDA'] = variables['predictionData'][player + ' Champ KDA']
@@ -57,7 +69,7 @@ def predict(port):
             print("A nee live match has started!")
             with open("rf.pickle", "rb") as pick:
                 rf = pickle.load(pick)
-            prediction_data, player_list = getData(port, scrape=True)
+            prediction_data, player_list = getData(response, scrape=True)
 
             prediction_data = pd.DataFrame(prediction_data, index=[0])
             prediction = rf.predict_proba(prediction_data)[0]
@@ -70,7 +82,9 @@ def predict(port):
 
             return render_template('index.html', variables=variables)
         except Exception as e:
-            return str(e)
+            if os.path.exists('variables2.pickle'):
+                os.remove('variables2.pickle')
+            return render_template('broken.html', variables=e)
 
 @socketio.on('startMatch')
 def startMatch():
@@ -132,10 +146,10 @@ def getChampWinRate(region, currentChampion):
     return soup.find(text=currentChampion).parent.parent.parent.findAll("td")[3]['data-value']
 
 
-def getData(port, scrape):
+def getData(response, scrape):
     with open("item2value.pickle", "rb") as pick:
         item2value = pickle.load(pick)
-    response = requests.get(f'https://127.0.0.1:{port}/liveclientdata/allgamedata')
+    # response = requests.get(f'https://127.0.0.1:{port}/liveclientdata/allgamedata')
     # with open("exjson.json", "rb") as pick:
     #     response = pickle.load(pick)
     text = json.loads(response)

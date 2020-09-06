@@ -12,10 +12,11 @@
     <!-- Script to handle socket.io -->
     <script>
         var socket;
-        $(document).ready(function() {
+        $(window).load(function() {
             // The http vs. https is important. Use http for localhost!
             socket = io.connect('http://127.0.0.1:5000');
-            socket.emit('startMatch', "OMG IS HTIS WORKING");
+<!--            socket.emit('startMatch');-->
+<!--            socket.emit('checkLive');-->
             {% set ns = namespace() %}
             socket.on('redirect', function(data){
             window.location = data.url;
@@ -75,9 +76,16 @@
             <h1 class="masthead-brand" style="font-family:'Courier'"><b>League of Legends Live Match Predictor</b></h1>
         </div>
     </header>
+    <br>
+    <form action = "/2" method = "post">
+        <label for="json_data">Copy and paste data from <a href="https://127.0.0.1:2999/liveclientdata/allgamedata">https://127.0.0.1:2999/liveclientdata/allgamedata</a></label>
+        <br>
+        <input type="text" id="json_data_id" name="json_data">
+        <input type="Submit" value="Submit">
+    </form>
+
     <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
       <main role="main" class="inner cover">
-          {{variables.predictions}}
         {% if variables.predictions[1] > 0.50 %}
 
             <p class="lead" style="font-weight:bold; font-size:32px; color:blue">Blue has a {{variables.predictions[1] * 100}}% chance of winning!</p>
