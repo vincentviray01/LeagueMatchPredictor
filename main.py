@@ -4,7 +4,7 @@ from riotwatcher import LolWatcher, ApiError
 import json
 
 
-API_KEY = "RGAPI-2e65583b-4c32-4042-b831-0d0d7f720ae0"
+API_KEY = ""
 PLATFORM_ROUTING_VALUE = "na1.api.riotgames.com"
 REGIONAL_ROUTING_VALUE = "americas.api.riotgames.com"
 watcher = LolWatcher(API_KEY)
