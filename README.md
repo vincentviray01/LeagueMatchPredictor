@@ -8,7 +8,7 @@ For predictions, I used the Riot Games Live Client Data API to gather informatio
 
 In order too use this website, make sure you are in an active match of league of legends on the Summoner’s Rift map. You can check this by going to “https://127.0.0.1:2999/liveclientdata/allgamedata” and seeing if you get a response.
 
-If you get a response, copy the data and go to liveleaguematchpredictor.herokuapp.com where there will be an text box for you to paste the copied data. Simply click the input button and you will enter a page similar to the images below.
+If you get a response, copy the data and go to "liveleaguematchpredictor.herokuapp.com" where there will be an text box for you to paste the copied data. Simply click the input button and you will enter a page similar to the images below.
 
 !['websiteimage1'](https://raw.githubusercontent.com/vincentviray01/LeagueMatchPredictor/master/images/leagueliveclient1.png.png)
 !['websiteimage2'](https://raw.githubusercontent.com/vincentviray01/LeagueMatchPredictor/master/images/leagueliveclient12png.png)
